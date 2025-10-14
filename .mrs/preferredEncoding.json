@@ -1,0 +1,80 @@
+{
+	"details": [
+		{
+			"file": "User/lua_task.c",
+			"encoding": "utf8"
+		},
+		{
+			"file": "LUA/lauxlib.h",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/lua_task.h",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/system_init.h",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/system_init.c",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/system_ch32v30x.h",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/system_ch32v30x.c",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/main.h",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/main.c",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/led_task.h",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/led_task.c",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/io_task.h",
+			"encoding": "utf8"
+		},
+		{
+			"file": "User/io_task.c",
+			"encoding": "utf8"
+		},
+		{
+			"file": "LUA/lapi.c",
+			"encoding": "utf8"
+		},
+		{
+			"file": "LUA/liolib.c",
+			"encoding": "utf8"
+		},
+		{
+			"file": "LUA/linit.c",
+			"encoding": "utf8"
+		},
+		{
+			"file": "LUA/lgc.h",
+			"encoding": "utf8"
+		},
+		{
+			"file": "LUA/luaconf.h",
+			"encoding": "utf8"
+		},
+		{
+			"file": "DRIVER/hal_dma_ch32.c",
+			"encoding": "utf8"
+		}
+	]
+}
