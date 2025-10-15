@@ -1,58 +1,56 @@
-#ifndef USER_LED_TASK_H_
-#define USER_LED_TASK_H_
+/*
+ * led.h
+ *
+ *  Created on: Nov 12, 2021
+ *      Author: igor.dymov
+ */
+
+#ifndef INC_LED_H_
+#define INC_LED_H_
+
 
 #include "main.h"
+#include "types.h"
 
 
-#define BUTTON_COUNT 8
 
-#define  MAX_BRIGTH  0x3F
+
+#define MAX_BRIGTH  15
+#define BRIGTH_CONTER 200
+#define BRIGTH_R 200
+#define BRIGTH_G 80
+#define BRIGTH_B 150
+
+
 #define  MAX_DATA 0xFF
-#define  MAX_BRIGTH_COUNTER   MAX_BRIGTH//90// 0x3F// *2
+#define  MAX_BRIGTH_COUNTER    150//MAX_BRIGTH *2
 #define  OFF 0x00
 
-#define LATCH_DEALY 	100U
+
 #define SPI_PACKET_SIZE 3U
 #define SPI_TIMEOUT		100U
 
-#define RED_COLOR 	1U
-#define GREEN_COLOR 2U
-#define BLUE_COLOR  3U
+#define SPI1_CHIP_COUNT     5
+#define SPI2_CHIP_COUNT     4
 
-#define RED		     0x01
-#define GREEN	     0x02
-#define BLUE	     0x03
-#define YELLOW       0x04
-#define CYAN		 0x05
-#define VIOLET		 0x06
-#define WHITE		 0x07
-#define AMBER        0x08
-#define YELLOW_GREEN 0x09
+#define BAR_GREEN_WORD   0
+#define BAR_RED_WORD     1
+#define RGB_BLUE_WORD    2
+#define RGB_GREEN_WORD   3
+#define RGB_RED_WOED     4
 
 
-#define SET_LED_ON_RED		0x01
-#define SET_LED_ON_GREEN	0x02
-#define SET_LED_ON_BLUE 	0x03
-#define SET_LED_BLINK_RED	0x04
-#define SET_LED_BLINK_GREEN	0x05
-#define SET_LED_BLINK_BLUE 	0x06
-
-#define DISABLE    0x00
-#define FULL_SHOW  0x01
-#define FLASH_SHOW 0x02
-#define PWM_TIM_PERIOD   1000
-
-void vSetBackLigthColor(uint8_t color);
-void vSetLedBrigth(uint8_t brigth);
-void vSetLedOn(uint8_t Color,uint8_t State);
-
-
-uint8_t uGetLedState( uint8_t Color );
-void vSetBackLigth(uint8_t brigth);
+extern const u8 DigitMask[];
+void SetSegPoint( u8 on);
+void SetSegDirect( u8 number, u8 mask);
+void SetSEG( u16 mask, u32 value, u8 point);
+void vSetInitBrigth(BRIGTH_CHANNEL_t ch, u8 brigth);
+void vSetBrigth( BRIGTH_CHANNEL_t ch, u8 brigth);
+void SetBigSeg( u16 mask);
+void SetBarState( u8 start_g, u8 count_g, u8 start_r, u8 count_r );
+void SetRGB(  u8 number, LED_COLOR_t color, LED_STATE_t state);
+void vRGBProcess();
 void vLedDriverStart(void);
-
-void TimersCallback();
-void vSetBrigth(uint8_t brigth);
-
-
-#endif
+void vLedProcess( void );
+void SetDataSEG( u16 mask, u16 channel);
+#endif /* INC_LED_H_ */

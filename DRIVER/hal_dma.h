@@ -104,13 +104,7 @@ typedef struct
 
 } DMA_CFG_t;
 
-#if CORE == WCH32V2
-
 void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr,  uint8_t prior, uint8_t subprior, void (*f)(void));
-#else
-
-void HAL_DMAInitIT(  DMA_INIT_t Init, uint8_t prior, uint8_t subprior, void (*f)(void));
-#endif
 void HAL_DMA_SetCouterAndEnable(DMA_Stram_t stream, uint32_t counter );
 void HAL_DMA_Start(DMA_Stram_t stream, uint32_t counter, u32 memadr );
 

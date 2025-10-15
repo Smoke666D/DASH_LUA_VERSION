@@ -9,10 +9,10 @@
 #include "hal_timers.h"
 
 
-#if DOUT_COUNT>0 
+#if DIN_COUNT>0 
 static DinConfig_t 				 xDinConfig[ DIN_COUNT];
 #endif
-#if DOUT_COUNT>0 && RPM_CHANNEL_COUNT>0
+#if DIN_COUNT>0 && RPM_CHANNEL_COUNT>0
 static median_filter_data_t      RPM_MIDIAN_FILTER_STRUC[RPM_CHANNEL_COUNT];
 static aver_filter_data_t        RPM_AVER_FILTER_STRUC  [RPM_CHANNEL_COUNT];
 static RPM_Struct                RPM[RPM_CHANNEL_COUNT];
@@ -22,7 +22,7 @@ static DoutCinfig_t              xDoutConfig[DOUT_COUNT] __SECTION(RAM_SECTION_C
 #endif
 
 
-#if DOUT_COUNT>0
+#if DIN_COUNT>0
 void InitDinStcurt()
 {
 	for (uint8_t i = 0; i <DIN_COUNT; i++)
@@ -403,11 +403,13 @@ void vDinDoutProcess()
              vCheckRPM(i);
          }
      }
+#if DOUT_COUNT>0
     for (uint8_t i=0; i < DOUT_COUNT; i++)
     {
 
         xDoutConfig[i].setPortCallback(i, (xDoutConfig[i].ucActiveLevel == DOUT_ACTIVE_CONFIG_NEGATIVE) ? !xDoutConfig[i].ucValue : xDoutConfig[i].ucValue);
     }
+#endif
 }
 /*
  *   Возвращает состония порта

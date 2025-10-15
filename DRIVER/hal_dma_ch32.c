@@ -57,7 +57,7 @@ void     DMA1_Channel7_IRQHandler(void)   __attribute__((interrupt()));
 
 
 
-#if CORE == WCH32V2
+
 
 void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr,  uint8_t prior, uint8_t subprior, void (*f)(void))
 {
@@ -83,78 +83,7 @@ void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t d
         DMACH[stream]->PADDR = paddr;
         DMACH[stream]->MADDR = memadr;
         DMACH[stream]->CFGR |= DMA_IT_TC;
-        PFIC_IRQ_ENABLE_PG1(DMA1_Channel1_IRQn  + stream ,prior,subprior);
-}
-
-
-#endif
-
-
-#if CORE == WCH32V3
-INIT_FUNC_LOC void HAL_DMAInitIT(  DMA_INIT_t Init, uint8_t prior, uint8_t subprior, void (*f)(void))
-{
-#ifdef DMA2
-    if (Init.stream < DMA2_CH1)
-    {
-#endif
-        RCC->AHBPCENR |= RCC_AHBPeriph_DMA1;
-        DMA1->INTFCR  |= 0xF<<Init.stream;
-#ifdef DMA2_PRESENT
-    }
-    else
-    {
-        RCC_AHBPeriphClockCmd( RCC_AHBPeriph_DMA2, ENABLE );
-        DMA2->INTFCR |= 0xF<<Init.stream;
-    }
-#endif
-    //HAL_DMA_Disable(Init.stream);
-    u32 DMA_MemoryDataSize;
-    u32 DMA_PeripheralDataSize;
-    switch (Init.dma_size)
-    {
-       case DMA_BYTE:
-           DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-           DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-           break;
-      case DMA_HWORD:
-           DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-           DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-           break;
-      default:
-           DMA_MemoryDataSize = DMA_MemoryDataSize_Word ;
-           DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word ;
-           break;
-     }
-    DMA_CALLback[Init.stream].CallBack = f;
-    HAL_DMA_Disable(Init.stream);
-
-    uint32_t tmpreg = 0;
-    tmpreg = DMACH[Init.stream]->CFGR;
-    tmpreg &= CFGR_CLEAR_Mask;
-    tmpreg |= Init.direction |  Init.mode |
-                DMA_PeripheralInc_Disable | DMA_MemoryInc_Enable |
-                DMA_PeripheralDataSize | DMA_MemoryDataSize |
-    Init.prioroty |  DMA_M2M_Disable;
-
-    DMACH[Init.stream]->CFGR = tmpreg;
-    DMACH[Init.stream]->CNTR = Init.bufsize;
-    DMACH[Init.stream]->PADDR = Init.paddr;
-    DMACH[Init.stream]->MADDR = Init.memadr;
-    DMACH[Init.stream]->CFGR |= DMA_IT_TC;
-#ifdef DMA2
-    if (Init.stream < DMA2_CH1)
-    {
-        PFIC_IRQ_ENABLE_PG2(DMA1_Channel1_IRQn  + Init.stream ,prior,subprior);
-    }
-    else
-    {
-
-        PFIC_IRQ_ENABLE_PG2(DMA2_Channel1_IRQn  + (Init.stream-DMA2_CH1) ,prior,subprior);
-    }
-#else
-    PFIC_IRQ_ENABLE_PG1(DMA1_Channel1_IRQn  + Init.stream ,prior,subprior);
-#endif
-
+        PFIC_IRQ_ENABLE_PG2(DMA1_Channel1_IRQn  + stream ,prior,subprior);
 }
 
 
@@ -182,7 +111,7 @@ void HAL_DMA1InitMemToMemHwordIT(DMA_Stram_t stream ,
     PFIC_IRQ_ENABLE_PG2(DMA1_Channel1_IRQn  + stream , prior, subprior);
 }
 
-#endif
+
 void HAL_DMAMem2MemStart(DMA_Stram_t stream, uint32_t data_size, u32 source, u32 dest )
 {
     DMACH[stream]->CNTR = data_size;

@@ -63,8 +63,7 @@
 #define DMA1_CH5_SUBPRIOR 2
 #define TIMER3_PRIOR      1
 #define TIMER3_SUBPRIOR   3
-#define CAN1_PRIOR        1
-#define CAN1_SUBPRIOR     0
+
 
 
 //#define USART1_IT_ENABLE
@@ -78,6 +77,9 @@
 
 //#define ADC_1_IT_ENABLE
 //#define ADC_2_IT_ENABLE
+
+#define CAN1_PRIOR        1
+#define CAN1_SUBPRIOR     3
 
 #endif /* SYSTEM_CONFIG_H_ */
 

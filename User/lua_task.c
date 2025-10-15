@@ -104,12 +104,6 @@ static const luaL_Reg dev_funcs[] = {
 	{"Config",         iCanSetConfig         },
   {"SetNodeID",      iSetCanNodeID         },
   {"GetKeys",     iGetKeyMask}, 
-  {"SetLedRed",   iSetLedRed },
-  {"SetLedGreen", iSetLedGreen },
-  {"SetLedBlue",  iSetLedBlue },
-  {"SetLedBrigth", iSetLedBrigth},
-  {"SetBackColor", iSetBackColor},
-  {"SetBackBrigth", iSetBackBrigth},
   {NULL, NULL}
 };
 
@@ -300,62 +294,9 @@ static int iGetKeyMask(lua_State *L)
     return ( ONE_RESULT );
 }
 
-static int iSetLedRed(lua_State *L)
-{
-  int res;
-  uint8_t data = lua_tointegerx(L,LAST_ARGUMENT, &res);
-  if  (res ==  1)
-  {
-      vSetLedOn(RED,data);
-  }
-  return ( NO_RESULT );
-}
 
-static int iSetLedGreen(lua_State *L)
-{
-   int res;
-  uint8_t data = lua_tointegerx(L,LAST_ARGUMENT, &res);
-  if  (res ==  1)
-  {
-    	
-      vSetLedOn(GREEN,data);
-  }
-  return ( NO_RESULT );
-}
 
-static int iSetLedBlue(lua_State *L)
-{
-  if  (lua_gettop(L) == ONE_ARGUMENT)
-  {
-      vSetLedOn(BLUE,lua_tointeger(L,LAST_ARGUMENT ));
-  }
-  return ( ONE_RESULT );
-}
 
-static int iSetBackBrigth(lua_State *L)
-{
-  if  (lua_gettop(L) == ONE_ARGUMENT)
-  {
-      vSetBackLigth(lua_tointeger(L,LAST_ARGUMENT ));
-  }
-  return ( ONE_RESULT );
-}
-static int iSetBackColor(lua_State *L)
-{
-  if  (lua_gettop(L) == ONE_ARGUMENT)
-  {
-    vSetBackLigthColor(lua_tointeger(L,LAST_ARGUMENT ));
-  }
-  return ( ONE_RESULT );
-}
-static int iSetLedBrigth(lua_State *L)
-{
-  if  (lua_gettop(L) == ONE_ARGUMENT)
-  {
-    vSetLedBrigth(lua_tointeger(L,LAST_ARGUMENT ));
-  }
-  return ( ONE_RESULT );
-}
 
 
 /*
