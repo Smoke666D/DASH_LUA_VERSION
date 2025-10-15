@@ -26,6 +26,9 @@
 #define  MAX_BRIGTH_COUNTER    150//MAX_BRIGTH *2
 #define  OFF 0x00
 
+#define RGB_LED_COUNT   14
+#define COLOR_COUNT      3
+#define BAR_LED_COUNT  16
 
 #define SPI_PACKET_SIZE 3U
 #define SPI_TIMEOUT		100U

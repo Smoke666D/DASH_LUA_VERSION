@@ -118,6 +118,7 @@ DIN_FUNCTION_ERROR_t eSetDUT(OUT_NAME_TYPE ucCh, uint8_t state )
 }
 #endif
 
+#if DOUT_COUNT>0
 void xSetOut( uint8_t * data_mask)
 {
     uint8_t mask = 0x01;
@@ -154,7 +155,6 @@ void xGetOut( uint8_t * data_mask)
 
 }
 
-#if DOUT_COUNT>0
 uint8_t eGetDOUT(OUT_NAME_TYPE ucCh )
 {
     return ( xDoutConfig[ucCh].ucValue) ;

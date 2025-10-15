@@ -14,6 +14,7 @@ static AIN_DATA_t xAinData[AIN_NUMBER] 							__SECTION(RAM_SECTION_CCMRAM);
 static uint16_t muRawVData[AIN_NUMBER + 2]  					__SECTION(RAM_SECTION_CCMRAM);
 static uint16_t muRawOldVData[AIN_NUMBER + 2]					__SECTION(RAM_SECTION_CCMRAM);
 static LIN_COOF   xKoofData[ MAX_COOF_COUNT] 					__SECTION(RAM_SECTION_CCMRAM);
+static uint16_t usCurMaxIndex;
 #endif
 
 #if DAC_NUMBER>0
@@ -34,7 +35,7 @@ static uint16_t usCurMaxIndex 									__SECTION(RAM_SECTION_CCMRAM);
 #endif
 
 #if ADC1_CHANNEL>0
-int16_t            ADC1_IN_Buffer[ADC_FRAME_SIZE*ADC1_CHANNELS]; 
+int16_t            ADC1_IN_Buffer[ADC_FRAME_SIZE*ADC1_CHANNEL]; 
 #endif
 #if ADC2_CHANNEL>0
 int16_t            ADC2_IN_Buffer[ADC_FRAME_SIZE*ADC2_CHANNELS] __SECTION(RAM_SECTION_RAM );   //ADC2 input data buffer
@@ -57,6 +58,7 @@ INIT_FUNC_LOC void vAINInit()
     	muRawOldOutCurData[i]  = 0;
     	muRawCurData[i] 		= 0;
     }
+    
 #endif
     for (uint8_t i = 0; i< AIN_NUMBER + 2;i++)
     {
@@ -365,19 +367,24 @@ float usGetCurrentToFloat( uint16_t rawdata, LIN_COOF * xOut )
 
 static void vGetAverDataFromRAW(uint16_t * InData, uint16_t *OutData, uint8_t InIndex, uint8_t OutIndex, uint8_t Size, uint16_t BufferSize);
 
+#if ADC1_CHANNEL>0
 int16_t * getADC1Buffer()
 {
 	return (ADC1_IN_Buffer);
 }
+#endif
+#if ADC2_CHANNEL>0
 int16_t * getADC2Buffer()
 {
 	return (ADC2_IN_Buffer);
 }
+#endif
+#if ADC3_CHANNEL>0
 int16_t * getADC3Buffer()
 {
 	return (ADC3_IN_Buffer);
 }
-
+#endif
 void vInitADCDATA()
 {
 #ifdef IPS_OUTS

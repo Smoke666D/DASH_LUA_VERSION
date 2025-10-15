@@ -11,6 +11,7 @@
 #include "led_task.h"
 #include "hal_spi.h"
 #include "hal_wdt.h"
+#include "hw_lib_adc.h"
 
 INIT_FUNC_LOC static void MX_GPIO_Init(void);
 
@@ -19,11 +20,11 @@ INIT_FUNC_LOC void InitDevice()
     MX_GPIO_Init( );
     USART_Printf_Init(115200);
     //HAL_RTC_IT_Init(&vIncrementSystemCounters,RTC_PRIOR,RTC_SUB_PRIOR,1);
-	HAL_TIMER_PWMTimersInit(TIMER3 , 1000000, 1000, TIM_CHANNEL_3 | TIM_CHANNEL_4  );
+	  HAL_TIMER_PWMTimersInit(TIMER3 , 1000000, 1000, TIM_CHANNEL_3 | TIM_CHANNEL_4  );
     HAL_TiemrEneblae( TIMER3);
     vSetBrigth(RGB_CHANNEL,0);
     vSetBrigth(WHITE_CHANNEL,0);
-    //vAINInit();
+    vAINInit();
     HAL_SPI_InitDMA(HAL_SPI1, SPI_16bit );
     HAL_SPI_InitDMA(HAL_SPI2, SPI_16bit );
     HAL_TIMER_InitIt( TIMER4, 1500000, 100, &vRGBProcess ,TIM4_PRIOR,TIM4_SUB_PRIOR);

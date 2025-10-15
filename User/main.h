@@ -58,11 +58,7 @@
 #define CAN_TX_Pin          GPIO_9
 
 
-#define DEF_H_FRONT 10U
-#define DEF_L_FRONT 10U
-#define RPM_CHANNEL_COUNT     2
-#define DIN_CHANNEL_COUNT     2
-#define DIN_COUNT            ( RPM_CHANNEL_COUNT + DIN_CHANNEL_COUNT )
+
 
 
 //#define TIM1_UP_ENABLE

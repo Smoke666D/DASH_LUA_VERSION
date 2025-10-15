@@ -40,12 +40,9 @@ static int iCanResetResiveFilter(lua_State *L );
 static int iCanCheckData( lua_State *L );
 static int iSetCanNodeID( lua_State *L );
 static int iGetKeyMask(lua_State *L);
-static int iSetLedRed(lua_State *L);
-static int iSetLedGreen(lua_State *L);
-static int iSetLedBlue(lua_State *L);
-static int iSetBackBrigth(lua_State *L);
-static int iSetBackColor(lua_State *L);
-static int iSetLedBrigth(lua_State *L);
+static int iSetLed(lua_State *L);
+static int iSetBar(lua_State *L);
+
 
 TaskHandle_t * xGetLuaTaskHandle ()
 {
@@ -101,9 +98,11 @@ static const luaL_Reg dev_funcs[] = {
 	{"GetFrame",       iCanGetResivedData    },
   {"SetFilter",      iCanSetResiveFilter   },
   {"ResetFilter",    iCanResetResiveFilter },
-	{"Config",         iCanSetConfig         },
+	{"CanConfig",         iCanSetConfig         },
   {"SetNodeID",      iSetCanNodeID         },
-  {"GetKeys",     iGetKeyMask}, 
+  {"GetKeys",        iGetKeyMask           }, 
+  {"SetLed",         iSetLed               },
+  {"SetBar",         iSetBar               },
   {NULL, NULL}
 };
 
@@ -114,7 +113,7 @@ LUAMOD_API int luaopen_dev (lua_State *L) {
 
 static const luaL_Reg userlibs[] = {
 
-  {"Keypad8", luaopen_dev  },
+  {"Dashboard", luaopen_dev  },
   {NULL, NULL}
 };
 
@@ -296,9 +295,6 @@ static int iGetKeyMask(lua_State *L)
 
 
 
-
-
-
 /*
 Функция установки CAN фильторв
 */
@@ -385,3 +381,33 @@ static int iCanGetResivedData(lua_State *L )
 	return ( 1U );
 }
 
+static int iSetLed(lua_State *L)
+{
+  if (lua_gettop(L) >= THREE_ARGUMENTS )
+  {
+    uint8_t led_index = lua_tointeger(L, FIRST_ARGUMENT);
+    uint8_t led_color = lua_tointeger(L, SECOND_ARGUMENT);
+    uint8_t led_state = lua_tointeger(L, THIRD_ARGUMENT);
+    if ((led_index < RGB_LED_COUNT) && ( led_color < COLOR_COUNT))
+    {
+        SetRGB(led_index,led_color,led_state);
+    }
+  }
+  return (NO_RESULT);
+}
+
+static int iSetBar(lua_State *L)
+{
+  if (lua_gettop(L) >= FOUR_ARGUMENTS )
+  {
+    uint8_t green_start = lua_tointeger(L, FIRST_ARGUMENT);
+    uint8_t green_count = lua_tointeger(L, SECOND_ARGUMENT);
+    uint8_t red_start = lua_tointeger(L, THIRD_ARGUMENT);
+    uint8_t red_count = lua_tointeger(L, FOURTH_ARGUMENT);
+    if ((green_start < BAR_LED_COUNT ) && ( green_count < BAR_LED_COUNT )  )
+    {
+        SetBarState(green_start,green_count,red_start,red_count);
+    }
+  }
+  return (NO_RESULT);
+}
