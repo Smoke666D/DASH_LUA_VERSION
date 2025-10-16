@@ -28,6 +28,8 @@
 #define CANRX_STK_SIZE             256
 #define IO_TASK_PRIO                5 //ДОЛЖЕН БЫТЬ САМЫ ВЫСОКИЙ
 #define IO_STK_SIZE                 128
+#define DEFAULT_TASK_PRIOR              9
+#define DEFAULT_TASK_STACK_SIZE         128U
 
 #define  CANRX_QUEUE_SIZE 				16U
 #define  CANTX_QUEUE_SIZE 				16U
@@ -43,5 +45,5 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer,
 void vSYStaskInit ( void );
 void vSYSqueueInit ( void );
 void vSYSeventInit ( void );
-
+void vSystemStop( void );
 #endif /* USER_SYSTEM_INIT_H_ */

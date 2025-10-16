@@ -4,7 +4,7 @@
 #include "hw_lib_keyboard.h"
 #include "filters.h"
 #include "lib_config.h"
-#include "hw_lib_din.h"
+
 
 #include "hw_timeout.h"
 #include "hal_timers.h"
@@ -12,18 +12,27 @@
 #include "hw_lib_adc.h"
 #include "hal_adc.h"
 
+
+static SemaphoreHandle_t xSemaphore = NULL;
+
 static float    OurVData[ ADC1_CHANNEL];
 static uint16_t ADC_OLD_RAW[ ADC1_CHANNEL  ];
 static uint16_t    RawADC[3];
 static TaskHandle_t  IOTaskHandle;
-static uint8_t  STATUS[KEY_COUNT];
-static uint8_t  COUNTERS[KEY_COUNT];
-static MessageBufferHandle_t pKeyboardMessageBuffer;
 static ADC_Conversionl_Buf_t DataBuffer[ 3 ];
 static int16_t AIN1Buffer[ AIN_MAX_BUFFER_SIZE ];
 static int16_t AIN2Buffer[ AIN_MAX_BUFFER_SIZE ];
 static int16_t AIN3Buffer[ AIN_MAX_BUFFER_SIZE ];
-
+INIT_FUNC_LOC static void vDINInit( void );
+static  void CaptureDMACallBack( void );
+static  void CaptureDMACallBack_1( void );
+static uint8_t fDinStateCallback (uint8_t i);
+/*
+*/
+SemaphoreHandle_t * pGetDinSemaphoreHandle()
+ {   
+   return (&xSemaphore);
+ }   
 TaskHandle_t * xGetIOTaskHandle ()
 {
     return  &IOTaskHandle ;
@@ -60,53 +69,7 @@ INIT_FUNC_LOC void ADC1_Init()
 
 
 
-BitState_t fPortState (uint8_t i)
-{
-    switch (i)
-    {
-        case 0:
-            return HAL_GetBit( KL1_Port, KL1Pin  );
-        case 1:
-            return HAL_GetBit( KL2_8_Port, KL2Pin  );
-        case 2:
-            return HAL_GetBit( KL2_8_Port, KL3Pin  );
-        case 3:
-            return HAL_GetBit( KL2_8_Port, KL4Pin  );
-        case 4:
-            return HAL_GetBit( KL2_8_Port, KL5Pin  );
-        case 5:
-            return HAL_GetBit( KL2_8_Port, KL6Pin  );
-        case 6:
-            return HAL_GetBit( KL2_8_Port, KL7Pin  );
-        case 7:
-            return HAL_GetBit( KL2_8_Port, KL8Pin  );
-        default:
-            return 0;
-    }
-}
 
-
-
-void vInitKeybord()
-{
-    KeybaordStruct_t KeyboardInit;
-    KeyboardInit.KEYBOARD_COUNT    = KEY_COUNT;
-    KeyboardInit.COUNTERS          = COUNTERS;
-    KeyboardInit.STATUS            = STATUS;
-    KeyboardInit.REPEAT_TIME       = 3;
-    KeyboardInit.KEYDOWN_HOLD_TIME = 4;
-    KeyboardInit.KEYDOWN_DELAY     = 2;
-    KeyboardInit.KEYBOARD_PERIOD   = 20;
-    KeyboardInit.getPortCallback = &fPortState;
-    eKeyboardInit(&KeyboardInit);
-}
-
-static uint8_t data;
-
-uint8_t getKeyData()
-{
-    return data;
-}
 
 void ADC_FSM( BaseType_t time, u8 * init_flag )
 {
@@ -180,74 +143,52 @@ uint16_t GetAINRaw(u8 ch)
     return ( RawADC[ch]);
 }
 
-/*
- *
- */
-uint8_t fDinStateCallback (uint8_t i)
-{
-    switch ( i )
-    {
-        case INPUT_3:
-            return HAL_GetBit(  Din3_4_5_Port , Din3_Pin);
-        case INPUT_4:
-            return HAL_GetBit(  Din3_4_5_Port , Din5_Pin);
-        default:
-            return (RESET);
-    }
-}
+
+
+
 
 /*
- *
+Функция конфигурации дискретных входов
 */
- void CaptureDMACallBack(  )
-{
-   HAL_DMA_Disable(DMA1_CH4);
-   HAL_DMA_SetCounter(DMA1_CH4,  CC_BUFFER_SIZE);
-   RMPDataConvert(INPUT_1);
-   HAL_DMA_Enable(DMA1_CH4);
-}
-
- void CaptureDMACallBack_1(  )
-{
-   HAL_DMA_Disable(DMA1_CH7);
-   HAL_DMA_SetCounter(DMA1_CH7,  CC_BUFFER_SIZE);
-   RMPDataConvert(INPUT_2);
-   HAL_DMA_Enable(DMA1_CH7);
-}
-
-
 void DinConfig( uint8_t DIN, uint32_t L_FRONT, uint32_t H_FRONT, DIN_INPUT_TYPE type)
 {
-
-
-
-	
+    xSemaphoreTake( xSemaphore, portMAX_DELAY );
+    if (DIN < INPUT_5 )
+    {
+        if (type == RPM_CONFIG )
+        {
+            if (DIN ==INPUT_1)
+            {
+                eRPMConfig(INPUT_1,RPM_CH1);
+                HAL_TimeInitCaptureDMA( TIMER1 , 30000, 60000, TIM_CHANNEL_4);
+                HAL_DMAInitIT( DMA1_CH4,PTOM, DMA_HWORD , (u32)&TIM1->CH4CVR, (u32) getCaputreBuffer(INPUT_1),  TIM1_DMA_PRIOR , TIM1_DMA_SUBPRIOR, &CaptureDMACallBack );
+                HAL_DMA_SetCouterAndEnable(DMA1_CH7,  CC_BUFFER_SIZE);
+                HAL_TiemrEneblae(TIMER1);
+            }
+            if (DIN == INPUT_2)
+            {
+                eRPMConfig(INPUT_2,RPM_CH2);
+                HAL_TimeInitCaptureDMA( TIMER2 , 30000, 60000, TIM_CHANNEL_2);
+                HAL_DMAInitIT( DMA1_CH4,PTOM, DMA_HWORD , (u32)&TIM1->CH4CVR, (u32) getCaputreBuffer(INPUT_1),  TIM1_DMA_PRIOR , TIM1_DMA_SUBPRIOR, &CaptureDMACallBack );
+                HAL_DMAInitIT( DMA1_CH7,PTOM, DMA_HWORD , (u32)&TIM2->CH2CVR, (u32) getCaputreBuffer(INPUT_2),  TIM1_DMA_PRIOR , TIM1_DMA_SUBPRIOR, &CaptureDMACallBack_1 );
+                HAL_DMA_SetCouterAndEnable(DMA1_CH4,  CC_BUFFER_SIZE);
+                HAL_TiemrEneblae(TIMER2);
+            }
+        }
+        else 
+        {
+            DinConfig_t DIN_CONFIG;
+            DIN_CONFIG.eInputType    = (type == 0) ? DIN_CONFIG_NEGATIVE : DIN_CONFIG_POSITIVE;
+            DIN_CONFIG.ulHighCounter = H_FRONT;
+            DIN_CONFIG.ulLowCounter  = L_FRONT;
+            DIN_CONFIG.getPortCallback = &fDinStateCallback;
+            eDinConfigWtihStruct(DIN,&DIN_CONFIG);
+        }
+    }
+    xSemaphoreGive( xSemaphore );
 }
 
 
- INIT_FUNC_LOC static void vDINInit()
-{
-    DinConfig_t DIN_CONFIG;
-    DIN_CONFIG.eInputType    = DIN_CONFIG_POSITIVE;
-    DIN_CONFIG.ulHighCounter = DEF_H_FRONT;
-    DIN_CONFIG.ulLowCounter  = DEF_L_FRONT;
-    DIN_CONFIG.getPortCallback = &fDinStateCallback;
-    eDinConfigWtihStruct(INPUT_4,&DIN_CONFIG);
-    DIN_CONFIG.eInputType =  DIN_CONFIG_NEGATIVE;
-    eDinConfigWtihStruct(INPUT_3,&DIN_CONFIG);
-    DIN_CONFIG.eInputType = DIN_CONFIG_POSITIVE;
-    //Конфигурация счетных входов
-    eRPMConfig(INPUT_1,RPM_CH1);
-    eRPMConfig(INPUT_2,RPM_CH2);
-    HAL_TimeInitCaptureDMA( TIMER1 , 30000, 60000, TIM_CHANNEL_4);
-    HAL_TimeInitCaptureDMA( TIMER2 , 30000, 60000, TIM_CHANNEL_2);
-    HAL_DMAInitIT( DMA1_CH4,PTOM, DMA_HWORD , (u32)&TIM1->CH4CVR, (u32) getCaputreBuffer(INPUT_1),  TIM1_DMA_PRIOR , TIM1_DMA_SUBPRIOR, &CaptureDMACallBack );
-    HAL_DMAInitIT( DMA1_CH7,PTOM, DMA_HWORD , (u32)&TIM2->CH2CVR, (u32) getCaputreBuffer(INPUT_2),  TIM1_DMA_PRIOR , TIM1_DMA_SUBPRIOR, &CaptureDMACallBack_1 );
-    HAL_DMA_SetCouterAndEnable(DMA1_CH7,  CC_BUFFER_SIZE);
-    HAL_DMA_SetCouterAndEnable(DMA1_CH4,  CC_BUFFER_SIZE);
-    HAL_TiemrEneblae(TIMER1);
-    HAL_TiemrEneblae(TIMER2);
-}
 
 void vIOTask(void *argument)
 {
@@ -261,10 +202,15 @@ void vIOTask(void *argument)
 	while(1)
 	{  
 		vTaskDelay(1);
-		if (++din_counter> 10)
+	    if (++din_counter> 10)
        {
-           vDinDoutProcess();
-           din_counter = 0;
+           /*Поскольку возможна конфигурация дискрентых входов на лету, блокируем процесс расчета на время конфига*/
+          if ( xSemaphoreTake( xSemaphore, ( TickType_t ) 0 ) == pdTRUE )
+          {
+            vDinDoutProcess();
+            din_counter = 0;
+            xSemaphoreGive( xSemaphore );
+          }
        }
 		if (xTaskNotifyWaitIndexed(2, 0, 0xFF, &ulNotifiedValue,0) )
 		{
@@ -289,7 +235,7 @@ void vIOTask(void *argument)
                 
                  if ((GetAIN(AIN5) < 4.9) || (uGetDIN(INPUT_4)== RESET))
                  {
-                   //  vSystemStop();
+                    vSystemStop();
                     // vSaveData();
                      
                     // HardwareDeinit();
@@ -304,4 +250,60 @@ void vIOTask(void *argument)
 
 		
 	}
+}
+
+
+INIT_FUNC_LOC static void vDINInit()
+{
+    DinConfig_t DIN_CONFIG;
+    DIN_CONFIG.eInputType    = DIN_CONFIG_POSITIVE;
+    DIN_CONFIG.ulHighCounter = DEF_H_FRONT;
+    DIN_CONFIG.ulLowCounter  = DEF_L_FRONT;
+    DIN_CONFIG.getPortCallback = &fDinStateCallback;
+    eDinConfigWtihStruct(INPUT_1,&DIN_CONFIG);
+    eDinConfigWtihStruct(INPUT_2,&DIN_CONFIG);
+    eDinConfigWtihStruct(INPUT_3,&DIN_CONFIG);
+    eDinConfigWtihStruct(INPUT_4,&DIN_CONFIG);
+    eDinConfigWtihStruct(INPUT_5,&DIN_CONFIG);
+}
+
+/*
+ *
+*/
+static  void CaptureDMACallBack(  )
+{
+   HAL_DMA_Disable(DMA1_CH4);
+   HAL_DMA_SetCounter(DMA1_CH4,  CC_BUFFER_SIZE);
+   RMPDataConvert(INPUT_1);
+   HAL_DMA_Enable(DMA1_CH4);
+}
+
+static void CaptureDMACallBack_1(  )
+{
+   HAL_DMA_Disable(DMA1_CH7);
+   HAL_DMA_SetCounter(DMA1_CH7,  CC_BUFFER_SIZE);
+   RMPDataConvert(INPUT_2);
+   HAL_DMA_Enable(DMA1_CH7);
+}
+
+/*
+ *
+ */
+static uint8_t fDinStateCallback (uint8_t i)
+{
+    switch ( i )
+    {
+        case INPUT_1:
+            return HAL_GetBit( Din1_Port , Din1_Pin);
+        case INPUT_2:
+            return HAL_GetBit( Din2_Port , Din2_Pin);
+        case INPUT_3:
+            return HAL_GetBit(  Din3_4_5_Port , Din3_Pin);
+        case INPUT_4:
+            return HAL_GetBit(  Din3_4_5_Port , Din5_Pin);
+        case INPUT_5:
+            return HAL_GetBit(  Din3_4_5_Port , Din4_Pin); 
+        default:
+            return (RESET);
+    }
 }

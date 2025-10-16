@@ -16,7 +16,7 @@
 #include "io_task.h"
 #include "string.h"
 #include "hal_wdt.h"
-
+#include "hw_lib_din.h"
 
 #define  FLASH_STORAGE_ADR         0x00025000UL
 #define  FLASH_STORAGE_LENGTH      0x2800U
@@ -42,6 +42,7 @@ static int iSetCanNodeID( lua_State *L );
 static int iGetKeyMask(lua_State *L);
 static int iSetLed(lua_State *L);
 static int iSetBar(lua_State *L);
+static int iDinConfig(lua_State *L);
 
 
 TaskHandle_t * xGetLuaTaskHandle ()
@@ -100,9 +101,10 @@ static const luaL_Reg dev_funcs[] = {
   {"ResetFilter",    iCanResetResiveFilter },
 	{"CanConfig",         iCanSetConfig         },
   {"SetNodeID",      iSetCanNodeID         },
-  {"GetKeys",        iGetKeyMask           }, 
   {"SetLed",         iSetLed               },
   {"SetBar",         iSetBar               },
+  {"DinConfig",      iDinConfig            },
+
   {NULL, NULL}
 };
 
@@ -287,11 +289,7 @@ static int iSetCanNodeID(lua_State *L)
 	return ( NO_RESULT );
 }
 
-static int iGetKeyMask(lua_State *L)
-{
-    lua_pushinteger(L, getKeyData());
-    return ( ONE_RESULT );
-}
+
 
 
 
@@ -410,4 +408,20 @@ static int iSetBar(lua_State *L)
     }
   }
   return (NO_RESULT);
+}
+
+static int iDinConfig(lua_State *L)
+{
+  uint8_t arg_number = lua_gettop(L);
+  if (arg_number >= ONE_ARGUMENT)
+  {
+    
+    DIN_INPUT_TYPE type =  (arg_number >ONE_ARGUMENT) ? lua_tointeger(L, SECOND_ARGUMENT) : DIN_CONFIG_POSITIVE;
+    uint32_t L_FRONT  = (arg_number > THREE_ARGUMENTS) ? lua_tointeger(L, THIRD_ARGUMENT) : DEF_L_FRONT;
+    uint32_t H_FRONT  = (arg_number > FOUR_ARGUMENTS) ? lua_tointeger(L, FOURTH_ARGUMENT) : DEF_H_FRONT;
+    DinConfig( lua_tointeger(L, FIRST_ARGUMENT),  L_FRONT, H_FRONT,  type);
+  }
+
+
+
 }

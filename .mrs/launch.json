@@ -4,7 +4,7 @@
 		{
 			"type": "mrs-debugger",
 			"request": "launch",
-			"name": "CH32V3_LUA",
+			"name": "DASH_LUA",
 			"cwd": "c:\\MRS_DATA\\workspace\\DASH_LUA_VERSION",
 			"openOCDCfg": {
 				"useLocalOpenOCD": true,
@@ -39,8 +39,8 @@
 					"additionalCommands": []
 				},
 				"loadedFiles": {
-					"executableFile": "c:\\MRS_DATA\\workspace\\DASH_LUA_VERSION\\obj\\CH32V3_LUA.elf",
-					"symbolFile": "c:\\MRS_DATA\\workspace\\DASH_LUA_VERSION\\obj\\CH32V3_LUA.elf",
+					"executableFile": "c:\\MRS_DATA\\workspace\\DASH_LUA_VERSION\\obj\\DASH_LUA.elf",
+					"symbolFile": "c:\\MRS_DATA\\workspace\\DASH_LUA_VERSION\\obj\\DASH_LUA.elf",
 					"executableFileOffset": 0,
 					"symbolFileOffset": 0
 				},

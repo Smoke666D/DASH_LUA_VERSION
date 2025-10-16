@@ -75,20 +75,20 @@ typedef struct
 	void (* event_callback_function)(u8, u16);
 } TimerConfif_t;
 #endif
-#if CORE == WCH32V2
 
 
-typedef struct
+
+/*typedef struct
 {
     void (* callback_function)();
     void (* event_callback_function)(u8, u16);
 } TimerConfif_t;
-
+*/
 u32 HAL_GetTimerCounterRegAdres(TimerName_t TimerName , uint8_t ch );
 void HAL_TIMER_EnablePWMCH(TimerName_t TimerName  );
 void HAL_TimeInitCaptureDMA( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel );
 
-#endif
+
 
 u16 HAL_TIMER_GetPuse(TimerName_t TimerName , uint8_t channel);
 void vHW_L_LIB_FreeRunEneblae( TimerName_t TimerName );

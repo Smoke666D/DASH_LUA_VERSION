@@ -2,6 +2,9 @@
 #define USER_IO_TASK_H_
 
 #include "main.h"
+
+#include "hw_lib_din.h"
+
 #define KEY_COUNT           8
 #define ADC1_DATA_READY 0x01
 #define K1   0x01
@@ -33,7 +36,10 @@ typedef enum
     SAVE_STATE,
 } INPUTS_FSM_t;
 
+void RPMConfig( uint8_t DIN );
 uint8_t getKeyData();
+SemaphoreHandle_t * pGetDinSemaphoreHandle();
+void DinConfig( uint8_t DIN, uint32_t L_FRONT, uint32_t H_FRONT, DIN_INPUT_TYPE type);
 TaskHandle_t * xGetIOTaskHandle ();
 void vIOTask(void *argument);
 #endif

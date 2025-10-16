@@ -12,6 +12,8 @@
 #include "hal_spi.h"
 #include "hal_wdt.h"
 #include "hw_lib_adc.h"
+#include "hal_rtc.h"
+#include "hw_data_model.h"
 
 INIT_FUNC_LOC static void MX_GPIO_Init(void);
 
@@ -19,7 +21,7 @@ INIT_FUNC_LOC void InitDevice()
 {
     MX_GPIO_Init( );
     USART_Printf_Init(115200);
-    //HAL_RTC_IT_Init(&vIncrementSystemCounters,RTC_PRIOR,RTC_SUB_PRIOR,1);
+  //  HAL_RTC_IT_Init(&vIncrementSystemCounters,RTC_PRIOR,RTC_SUB_PRIOR,1);
 	  HAL_TIMER_PWMTimersInit(TIMER3 , 1000000, 1000, TIM_CHANNEL_3 | TIM_CHANNEL_4  );
     HAL_TiemrEneblae( TIMER3);
     vSetBrigth(RGB_CHANNEL,0);
